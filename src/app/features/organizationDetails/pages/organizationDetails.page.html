@@ -1,0 +1,169 @@
+<p-toast />
+
+@if (store.isLoading()) {
+<div class="p-6 space-y-4">
+	<p-skeleton height="2rem" width="30%" />
+	<p-skeleton height="1rem" width="15%" />
+	<div class="grid grid-cols-2 gap-6 mt-6">
+		<p-skeleton height="300px" />
+		<p-skeleton height="300px" />
+	</div>
+</div>
+} @else if (store.organization(); as org) {
+<div>
+	<!-- Header -->
+	<div class="flex items-center justify-between mb-6">
+		<div>
+			<h1 class="text-2xl font-bold text-gray-900">{{ org.name }}</h1>
+			<div class="flex items-center gap-3 mt-1">
+				<span class="text-sm text-gray-400">{{ org.country }} ({{ org.countryCode }})</span>
+				<span class="text-gray-300">·</span>
+				<span class="text-sm text-gray-400">Joined {{ org.joinedOnUtc | date:'MMM d, yyyy' }}</span>
+			</div>
+		</div>
+		<p-button
+			label="Suspend Organization"
+			severity="danger"
+			[outlined]="true"
+			icon="pi pi-ban"
+			(onClick)="showSuspendDialog.set(true)" />
+	</div>
+
+	<!-- Responsive Splitter -->
+	<p-splitter
+		[panelSizes]="splitterSizes()"
+		[layout]="splitterLayout()"
+		Class="org-detail-splitter splitterHeight()">
+
+		<!-- Left: About, Services, Contact -->
+		<ng-template #panel>
+			<p-scrollpanel class="h-full w-full">
+				<div class="flex flex-col gap-4 p-2">
+
+					<!-- About -->
+					<div class="border border-gray-200 rounded-lg p-5">
+						<h2 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+							<i class="pi pi-building"></i> About
+						</h2>
+						<p class="text-sm text-gray-600 leading-relaxed">{{ org.about }}</p>
+					</div>
+
+					<!-- Services -->
+					<div class="border border-gray-200 rounded-lg p-5">
+						<h2 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+							<i class="pi pi-briefcase"></i> Services
+						</h2>
+						<p class="text-sm text-gray-600 mb-3">{{ org.serviceDescription }}</p>
+						<div class="flex flex-wrap gap-2">
+							@for (service of org.servicesProvided; track service) {
+							<span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">{{ service }}</span>
+							}
+						</div>
+					</div>
+
+					<!-- Contact -->
+					<div class="border border-gray-200 rounded-lg p-5">
+						<h2 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+							<i class="pi pi-envelope"></i> Contact
+						</h2>
+						<p class="text-sm text-gray-600">{{ org.contactEmail }}</p>
+					</div>
+				</div>
+			</p-scrollpanel>
+		</ng-template>
+
+		<!-- Right: Branches -->
+		<ng-template #panel>
+			<p-scrollpanel  class="h-full w-full">
+				<div class="border border-gray-200 rounded-lg p-5 m-2">
+					<h2 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+						<i class="pi pi-map-marker"></i> Branches
+						<span class="ml-auto text-xs text-gray-400 font-normal">{{ org.branches.length }} total</span>
+					</h2>
+
+					@if (org.branches.length === 0) {
+					<p class="text-sm text-gray-400 text-center py-8">No branches registered.</p>
+					} @else {
+					<div class="flex flex-col gap-3">
+						@for (branch of org.branches; track branch.id) {
+						<div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+							<div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
+								<i class="pi pi-map-marker text-gray-500 text-xs"></i>
+							</div>
+							<div>
+								<p class="text-sm font-medium text-gray-800">{{ branch.address }}</p>
+								<p class="text-xs text-gray-400 mt-1">
+									Opened {{ branch.openedSinceUtc | date:'MMM d, yyyy' }}
+								</p>
+							</div>
+						</div>
+						}
+					</div>
+					}
+				</div>
+			</p-scrollpanel>
+		</ng-template>
+	</p-splitter>
+</div>
+}
+
+<!-- Suspend Dialog -->
+<p-dialog
+	header="Suspend Organization"
+	[visible]="showSuspendDialog()"
+	(visibleChange)="showSuspendDialog.set($event)"
+	[modal]="true"
+	[draggable]="false">
+
+	<div class="flex flex-col gap-4 py-2">
+		<div class="p-3 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3">
+			<i class="pi pi-exclamation-triangle text-red-500 mt-0.5"></i>
+			<p class="text-sm text-red-700">
+				Suspending this organization will restrict all access immediately.
+				If the status remains unchanged for <strong>30 days</strong>, all data will
+				be permanently deleted.
+			</p>
+		</div>
+
+		<div class="flex flex-col gap-1">
+			<label for="suspend-reason" class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Reason*</label>
+			<p-select
+				inputId="suspend-reason"
+				[options]="reasons"
+				[ngModel]="suspendReason()"
+				(ngModelChange)="suspendReason.set($event)"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Select the reason for suspension"
+				class="w-full" />
+		</div>
+
+		<div class="flex flex-col gap-1">
+			<label for="suspend-notes" class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Notes*</label>
+			<textarea
+				id="suspend-notes"
+				pTextarea
+				[ngModel]="suspendNotes()"
+				(ngModelChange)="suspendNotes.set($event)"
+				placeholder="Additional notes..."
+				rows="3"
+				maxlength="512"
+				class="w-full">
+			</textarea>
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<p-button
+			label="Cancel"
+			severity="secondary"
+			[outlined]="true"
+			(onClick)="showSuspendDialog.set(false)" />
+		<p-button
+			label="Confirm Suspension"
+			severity="danger"
+			[loading]="store.isSubmitting()"
+			[disabled]="!suspendReason()"
+			(onClick)="onSuspendConfirm()" />
+	</ng-template>
+</p-dialog>

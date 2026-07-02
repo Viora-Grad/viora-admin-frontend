@@ -1,0 +1,205 @@
+<p-toast />
+<p-confirmdialog />
+
+@if (store.isLoading()) {
+<div class="p-6 space-y-4">
+	<p-skeleton height="2rem" width="40%" />
+	<p-skeleton height="1rem" width="20%" />
+	<div class="grid grid-cols-2 gap-6 mt-6">
+		<p-skeleton height="300px" />
+		<p-skeleton height="300px" />
+	</div>
+</div>
+} @else if (store.application(); as app) {
+<div>
+
+	<div class="flex items-center justify-between mb-6 px-6 pt-6">
+		<div>
+			<h1 class="text-2xl font-bold text-gray-900">Application: {{ app.name }}</h1>
+			<div class="flex items-center gap-3 mt-2">
+				<p-badge [value]="app.status" [severity]="getStatusSeverity(app.status)" />
+				<span class="text-sm text-gray-400">Submitted {{ app.submittedOnUtc |
+					date:'MMM d, yyyy · HH:mm' }}</span>
+			</div>
+		</div>
+
+		@if (app.status.toLowerCase() === 'pending') {
+		<div class="flex gap-3">
+			<p-button
+				label="Reject"
+				severity="danger"
+				[outlined]="true"
+				[loading]="store.isSubmitting()"
+				(onClick)="onReject()" />
+			<p-button
+				label="Approve"
+				severity="success"
+				[loading]="store.isSubmitting()"
+				(onClick)="onApprove()" />
+		</div>
+		}
+	</div>
+
+	<!-- Main layout: responsive splitter -->
+	<p-splitter
+		[panelSizes]="splitterSizes()"
+		[layout]="splitterLayout()"
+		Class="detail-splitter">
+		<!-- [style]="{ height: splitterHeight() }" -->
+
+		<!-- Left column -->
+		<ng-template #panel>
+			<p-scrollpanel class="w-full h-full">
+				<div class="flex flex-col gap-4 p-5">
+
+					<!-- Organization Details -->
+					<div class="border border-gray-200 rounded-lg p-5">
+						<h2 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+							<i class="pi pi-building"></i> Organization Details
+						</h2>
+						<div class="space-y-4">
+							<div>
+								<p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Name</p>
+								<p class="font-medium text-gray-800">{{ app.name }}</p>
+							</div>
+							<div>
+								<p class="text-xs text-gray-400 uppercase tracking-wide mb-1">About</p>
+								<p class="text-sm text-gray-600 leading-relaxed">{{ app.about }}</p>
+							</div>
+							<div>
+								<p
+									class="text-xs text-gray-400 uppercase tracking-wide mb-1">Services</p>
+								<div class="flex flex-wrap gap-2 mt-1">
+									@for (service of app.servicesProvided; track service) {
+									<span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">{{
+										service }}</span>
+									}
+								</div>
+							</div>
+							<div class="grid grid-cols-2 gap-4">
+								<div>
+									<p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Billing
+										Email</p>
+									<p class="text-sm text-gray-600 break-all">{{ app.billingEmail }}</p>
+								</div>
+								<div>
+									<p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Support
+										Email</p>
+									<p class="text-sm text-gray-600 break-all">{{ app.supportEmail }}</p>
+								</div>
+							</div>
+							<div>
+								<p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Referral
+									Source</p>
+								<p class="text-sm text-gray-600">{{ app.referralSource || '—' }}</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Applicant Info -->
+					<div class="border border-gray-200 rounded-lg p-5">
+						<h2 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+							<i class="pi pi-user"></i> Applicant Info
+						</h2>
+						<div class="flex items-center gap-3 mb-4">
+							<div
+								class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">
+								{{ app.ownerName.charAt(0).toUpperCase() }}
+							</div>
+							<div>
+								<p class="font-medium text-gray-800">{{ app.ownerName }}</p>
+								<p class="text-xs text-gray-400">{{ app.billingEmail }}</p>
+							</div>
+						</div>
+						@if (app.rejectedByName) {
+						<div class="mt-3 p-3 bg-red-50 rounded border border-red-100">
+							<p class="text-xs text-red-500 uppercase tracking-wide mb-1">Rejected
+								By</p>
+							<p class="text-sm text-red-700 font-medium">{{ app.rejectedByName }}</p>
+						</div>
+						}
+					</div>
+
+					<!-- Letter -->
+					@if (app.letter) {
+					<div class="border border-gray-200 rounded-lg p-5">
+						<h2 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+							<i class="pi pi-envelope"></i> Cover Letter
+						</h2>
+						<p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{
+							app.letter }}</p>
+					</div>
+					}
+				</div>
+			</p-scrollpanel>
+		</ng-template>
+
+		<!-- Right column: Documents -->
+		<ng-template #panel>
+			<p-scrollpanel class="w-full h-full">
+				<div class="border-l border-gray-200 h-full flex flex-col">
+					<div
+						class="px-5 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
+						<h2 class="font-semibold text-gray-800 flex items-center gap-2">
+							<i class="pi pi-file-pdf"></i> Official Documents
+						</h2>
+					</div>
+
+					<!-- Document Tabs -->
+					<div class="flex border-b border-gray-200 overflow-x-auto">
+						@for (tab of docTabs; track tab.key; let i = $index) {
+						<button type="button" class="doc-tab"
+							[class.active]="activeDocTab() === i"
+							(click)="onTabChange(i)">
+							{{ tab.label }}
+						</button>
+						}
+					</div>
+
+					<!-- Document Viewer -->
+					@if (getActiveDoc(); as doc) {
+					<div class="p-5">
+						<div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+							<div>
+								<p class="font-medium text-gray-800">{{ doc.name }}</p>
+								<p class="text-xs text-gray-400 mt-1">{{ doc.media.fileName }} · {{
+									doc.media.contentType }}</p>
+							</div>
+							<div class="flex items-center gap-2">
+								<span class="text-xs px-2 py-1 rounded bg-gray-100 text-gray-600">
+									{{ getDocStatusLabel(doc.status) }}
+								</span>
+								<span class="text-xs text-gray-400">
+									{{ doc.submittedOnUtc | date:'MMM d, yyyy' }}
+								</span>
+							</div>
+						</div>
+
+						<!-- PDF Embed -->
+						<div
+							class="bg-gray-50 rounded border border-gray-200 overflow-scroll h-96">
+							@if(activeDocUrl()){
+							<iframe
+								[src]="'data:' + doc.media.contentType + ';base64,' + doc.media.id"
+								class="w-full h-full border-0"
+								title="{{ doc.name }}">
+							</iframe>
+							}
+							@else {
+							<div class="flex items-center justify-center h-full text-gray-400">
+								<p>Loading document...</p>
+							</div>
+							}
+						</div>
+					</div>
+					}@else{
+					<div class="flex items-center justify-center h-96 m-5 rounded border border-gray-200 text-gray-400">
+						<p>Not Found!</p>
+					</div>
+					}
+				</div>
+			</p-scrollpanel>
+		</ng-template>
+	</p-splitter>
+</div>
+}

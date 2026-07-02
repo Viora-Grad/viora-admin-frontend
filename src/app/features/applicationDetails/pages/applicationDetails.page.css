@@ -1,0 +1,58 @@
+.doc-tab {
+	flex: 1;
+	padding: 12px 8px;
+	font-size: 12px;
+	font-weight: 500;
+	color: #6b7280;
+	background: white;
+	border: none;
+	border-bottom: 2px solid transparent;
+	cursor: pointer;
+	transition: all 0.15s;
+	text-align: center;
+	white-space: nowrap;
+}
+
+.doc-tab:hover {
+	color: #374151;
+	background: #f9fafb;
+}
+
+.doc-tab.active {
+	color: #201335;
+	border-bottom-color: #201335;
+	background: white;
+	font-weight: 600;
+}
+
+/* Splitter container fills available space and scrolls internally */
+::ng-deep .detail-splitter {
+	border: none !important;
+}
+
+::ng-deep .detail-splitter .p-splitter-gutter {
+	background: #f3f4f6;
+}
+
+/* On small/medium screens stack panels vertically and let each scroll on its own */
+@media (max-width: 1024px) {
+	::ng-deep .detail-splitter.p-splitter-vertical {
+		height: auto !important;
+	}
+
+	::ng-deep .detail-splitter .p-splitter-panel {
+		max-height: 70vh;
+		overflow-y: auto;
+	}
+
+	.doc-tab {
+		font-size: 11px;
+		padding: 10px 6px;
+	}
+}
+
+@media (max-width: 640px) {
+	::ng-deep .detail-splitter .p-splitter-panel {
+		max-height: 60vh;
+	}
+}

@@ -1,0 +1,80 @@
+<div class="container mx-auto">
+	<div class="mb-5">
+		<h1 class="text-2xl font-bold">Applications</h1>
+		<h5 class="text-sm text-gray-500">Review and manage inbound organizational requests for platform access</h5>
+	</div>
+
+	<!-- Filters -->
+	<div class="flex gap-3 mb-4 flex-wrap">
+		<input
+			pInputText
+			[(ngModel)]="filterName"
+			placeholder="Search by organization"
+			class="w-50" (ngModelChange)="applyFilters()" />
+
+		<p-select
+			[(ngModel)]="filterStatus"
+			[options]="statusOptions"
+			optionLabel="label"
+			optionValue="label"
+			placeholder="All statuses"
+			[showClear]="true"
+			class="w-50" (ngModelChange)="applyFilters()" />
+
+		<input
+			pInputText
+			[(ngModel)]="filterService"
+			placeholder="Search by Services..."
+			class="w-50" (ngModelChange)="applyFilters()" />
+
+		<!-- <p-button label="Search" icon="pi pi-search" (onClick)="applyFilters()" /> -->
+		<!-- <p-button label="Clear" icon="pi pi-times" severity="secondary" (onClick)="clearFilters()" /> -->
+	</div>
+
+	
+	<p-table
+		[value]="filteredApplications"
+		[tableStyle]="{ 'min-width': '70rem' }"
+		[lazy]="true"
+		[paginator]="true"
+		[rows]="store.pageSize()"
+		[totalRecords]="store.totalCount()"
+		(onPage)="onPageChange({ page: $event.first / $event.rows, rows: $event.rows })"
+		[loading]="store.isLoading()"
+		>
+
+		<ng-template pTemplate="header">
+			<tr>
+				<th>Organization</th>
+				<th>Owner</th>
+				<th>Status</th>
+				<th>Referral Source</th>
+				<th>Services</th>
+				<th>Submitted On</th>
+			</tr>
+		</ng-template>
+
+		<ng-template pTemplate="body" let-application>
+			<tr (click)="onRowClick(application.id)" class="cursor-pointer hover:bg-gray-50">
+				<td>{{ application.name }}</td>
+				<td>{{ application.ownerName }}</td>
+				<td>
+					<p-badge [value]="application.status" [severity]="getStatusSeverity(application.status)" />
+				</td>
+				<td>{{ application.referralSource }}</td>
+				<td>{{ application.servicesProvided.join(',') }}</td>
+				<td>{{ application.submittedOnUtc | date:'dd/MM/yyyy HH:mm' }}</td>
+			</tr>
+		</ng-template>
+
+		<ng-template pTemplate="emptymessage">
+			<tr>
+				<td colspan="6" class="text-center text-gray-400 py-8">
+					@if (store.items().length || store.isEmpty()) {
+						<span>No applications found.</span>
+					}
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</div>

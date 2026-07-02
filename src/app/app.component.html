@@ -1,0 +1,90 @@
+<!-- <h1 class="none">Viora</h1> -->
+@if (authStore.isAuthenticated()){<div class="card">
+    <p-splitter [panelSizes]="[15, 85]" class="mb-8 h-lvh">
+        <ng-template #panel>
+            <!-- Sidebar -->
+            <aside class="flex flex-col h-lvh">
+                <div class="flex items-center gap-3 mt-5 px-5">
+                    <div class="flex items-center justify-center w-8">
+                        <svg fill="#000000" viewBox="0 0 256 256"
+                            xmlns="http://www.w3.org/2000/svg"><g
+                                id="SVGRepo_bgCarrier" stroke-width="0" /><g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round" /><g
+                                id="SVGRepo_iconCarrier"> <path
+                                    d="M128 209c-44.735 0-81-36.265-81-81s36.265-81 81-81 81 36.265 81 81-36.265 81-81 81zm22.53-141.14A64.379 64.379 0 0 0 128.5 64a64.352 64.352 0 0 0-22.917 4.19 1317.969 1317.969 0 0 0 21.079 22.104c.77.79 2.042.806 2.831.038 0 0 12.798-12.235 21.038-22.472zm0 121.635c-8.239-10.237-21.05-22.665-21.05-22.665a1.975 1.975 0 0 0-2.806.041s-10.22 10.605-21.09 22.294a64.352 64.352 0 0 0 22.916 4.19 64.379 64.379 0 0 0 22.03-3.86zM89.908 76.531s-26.02 17.694-26.02 51.538c0 33.845 26.02 53.465 26.02 53.465l38.09-39.787 38.376 38.29s27.389-21.385 27.389-52.066c0-30.682-27.739-51.678-27.739-51.678l-25.672 26.32 13.39 13.837 13.112-11.68s6.936 10.757 7.035 23.153c.098 12.396-6.653 24.904-6.653 24.904l-39.191-38.937-37.495 38.69s-7.684-11.61-7.65-25.002c.035-13.393 7.008-24.966 7.008-24.966l12.75 12.488 14.996-12.609-27.746-25.96z"
+                                    fill-rule="evenodd" /> </g></svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold">Viora</span>
+                        <span class="text-[10px] label-sm">Super Admin</span>
+                    </div>
+                </div>
+
+                <nav class="flex-1 py-4 overflow-auto">
+                    @for (item of navItems; track item.route) {
+                    <a class="nav-item" [routerLink]="item.route"
+                        routerLinkActive="active"
+                        [routerLinkActiveOptions]="{exact: false}">
+                        <span class="material-symbols-outlined">{{
+                            item.icon}}</span>
+                        <span>{{ item.label }}</span>
+                    </a>
+                    }
+                </nav>
+
+                @if(currentUser()) {
+                <div class="flex items-center gap-3 p-5">
+                    <div class="admin-avatar ">
+                        <img Src='https://i.pravatar.cc/32?img=12'
+                            alt="Admin" />
+                    </div>
+                    <div class="flex flex-col">
+                        <span
+                            class="text-sm font-medium">{{currentUser()?.firstName+
+                            ' ' + currentUser()?.lastName }}</span>
+                        <span
+                            class="text-xs text-gray-500 label-sm">{{currentUser()?.email}}</span>
+                    </div>
+                </div>
+                }
+            </aside>
+
+        </ng-template>
+
+        <ng-template #panel>
+            <div class="flex h-full flex-col ">
+                <div
+                    class="bg-gray-100 p-3 flex flex-row-reverse justify-between rounded-sm">
+                    <!-- <input type="text" pInputText placeholder="Search for organizations " class="bg-gray-200 rounded-lg px-3.5 py-2" /> -->
+                    <svg width="23px" height="30px" viewBox="-1.5 0 20 20"
+                        version="1.1" xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        fill="#000000"><g id="SVGRepo_bgCarrier"
+                            stroke-width="0" /><g id="SVGRepo_tracerCarrier"
+                            stroke-linecap="round" stroke-linejoin="round" /><g
+                            id="SVGRepo_iconCarrier"> <title>notification_bell
+                                [#1397]</title> <desc>Created with
+                                Sketch.</desc> <defs /> <g id="Page-1"
+                                stroke="none" stroke-width="1" fill="none"
+                                fill-rule="evenodd"> <g
+                                    id="Dribbble-Light-Preview"
+                                    transform="translate(-181.000000, -720.000000)"
+                                    fill="#000000"> <g id="icons"
+                                        transform="translate(56.000000, 160.000000)"><path
+                                            d="M137.75,574 L129.25,574 L129.25,568 C129.25,565.334 131.375,564 133.498937,564 L133.501063,564 C135.625,564 137.75,565.334 137.75,568 L137.75,574 Z M134.5625,577 C134.5625,577.552 134.0865,578 133.5,578 C132.9135,578 132.4375,577.552 132.4375,577 L132.4375,576 L134.5625,576 L134.5625,577 Z M140.9375,574 C140.351,574 139.875,573.552 139.875,573 L139.875,568 C139.875,564.447 137.359,562.475 134.5625,562.079 L134.5625,561 C134.5625,560.448 134.0865,560 133.5,560 C132.9135,560 132.4375,560.448 132.4375,561 L132.4375,562.079 C129.641,562.475 127.125,564.447 127.125,568 L127.125,573 C127.125,573.552 126.649,574 126.0625,574 C125.476,574 125,574.448 125,575 C125,575.552 125.476,576 126.0625,576 L130.3125,576 L130.3125,577 C130.3125,578.657 131.739438,580 133.5,580 C135.260563,580 136.6875,578.657 136.6875,577 L136.6875,576 L140.9375,576 C141.524,576 142,575.552 142,575 C142,574.448 141.524,574 140.9375,574 L140.9375,574 Z"
+                                            id="notification_bell-[#1397]" /></g>
+                                </g> </g> </g></svg>
+                </div>
+                <p-breadcrumb [home]="home" [model]="items" />
+                <div class="mx-4 overflow-scroll">
+                    <router-outlet />
+                </div>
+            </div>
+        </ng-template>
+    </p-splitter>
+</div>}
+@else{
+<router-outlet />
+}

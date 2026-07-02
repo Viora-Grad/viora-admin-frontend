@@ -1,0 +1,49 @@
+<div class="container mx-auto">
+	<div class="mb-5">
+		<h1 class="text-2xl font-bold">Organizations</h1>
+		<h5 class="text-sm text-gray-500">Manage global enterprise entities and system access.</h5>
+	</div>
+
+	<p-table
+		[value]="store.items()"
+		[tableStyle]="{ 'min-width': '70rem' }"
+		[lazy]="true"
+		[paginator]="true"
+		[rows]="store.pageSize()"
+		[totalRecords]="store.totalCount()"
+		(onPage)="onPageChange({ page: $event.first / $event.rows, rows: $event.rows })"
+		[loading]="store.isLoading()">
+
+		<ng-template pTemplate="header">
+			<tr>
+				<th>Name</th>
+				<th>Country</th>
+				<th>Service Description</th>
+				<th>Services Provided</th>
+				<th>Ratings Count</th>
+				<th>Rating Out Of Ten</th>
+			</tr>
+		</ng-template>
+
+		<ng-template pTemplate="body" let-organization>
+			<tr class="cursor-pointer hover:bg-gray-50" (click)="onRowClick(organization.id)">
+				<td>{{ organization.name }}</td>
+				<td>{{ organization.country }}</td>
+				<td>{{ organization.serviceDescription }}</td>
+				<td>{{ organization.servicesProvided?.join(', ') }}</td>
+				<td>{{ organization.ratingsCount }}</td>
+				<td>{{ organization.ratingOutOfTen }}</td>
+			</tr>
+		</ng-template>
+
+		<ng-template pTemplate="emptymessage">
+			<tr>
+				<td colspan="6" class="text-center text-gray-400 py-8">
+					@if (store.isEmpty()) {
+						<span>No organizations found.</span>
+					}
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</div>
