@@ -9,11 +9,13 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs';
 import { ApplicationDetailStore } from './features/applicationDetails/store/applicationDetails.store';
 import { OrganizationDetailStore } from './features/organizationDetails/store/organizationDetails.store';
+import { NgOptimizedImage } from '@angular/common';
+
 
 
 @Component({
 	selector: 'app-root',
-	imports: [RouterOutlet, Splitter, Breadcrumb, RouterLink, RouterLinkActive],
+	imports: [RouterOutlet, Splitter, Breadcrumb, RouterLink, RouterLinkActive, NgOptimizedImage],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.css',
 	changeDetection: ChangeDetectionStrategy.OnPush,
